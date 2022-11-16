@@ -95,6 +95,19 @@ knitr::kable(cities_tests)
 ```
 
 
+Next, I  use create a plot that shows the estimates and CIs of the proportion of unsolved homicides for each city. I use `geom_errorbar` to add the upper and lower limits.
+```{r}
+cities_tests %>%
+  mutate(city_state = fct_reorder(city_state, estimate)) %>%
+  ggplot(aes(x = estimate, y = city_state)) + geom_point() + geom_errorbar(aes(xmin = conf.low, xmax = conf.high)) + 
+  labs(
+    title = "Proportion of unsolved homicides in the 50 largest U.S. cities",
+    x = "Proportion of unsolved homicides",
+    y = "City"
+  )
+```
+
+
 
 
 
