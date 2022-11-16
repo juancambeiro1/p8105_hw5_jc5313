@@ -43,11 +43,10 @@ homicide =
   janitor::clean_names()
 ```
 
-**Description**: This homicides dataset collected by The Washington Post includes data on `r nrow(homicide)` in 50 of the largest American cities. The dataset contains `r ncol(homicide)` variables, including: the report date of the murder (`report_date`), the victim's first and last name (`victim_first`, `victim_last`), key demographics of the victim (`victim_race`, `victim_age`, `victim_sex`), the location (`city`, `state`, `lat`, `lon`), and the status of the case (`disposition`). 
+**Description of raw data**: This homicides dataset collected by The Washington Post includes data on `r nrow(homicide)` in 50 of the largest American cities. The dataset contains `r ncol(homicide)` variables, including: the report date of the murder (`report_date`), the victim's first and last name (`victim_first`, `victim_last`), key demographics of the victim (`victim_race`, `victim_age`, `victim_sex`), the location (`city`, `state`, `lat`, `lon`), and the status of the case (`disposition`). 
 
 
-Next, I will tidy the data by using `mutate` to ensure appropriate data types and to make a `city_state` variable. Then, I will summarize within cities to obtain the total number of homicides and number of unsolved homicides.
-
+Next, I will tidy the data by using `mutate` to ensure appropriate data types and to make a `city_state` variable. 
 ```{r}
 homicidetidy = homicide %>%
   mutate(city_state = as.factor(str_c(city, state, sep = ", ")), 
@@ -56,7 +55,18 @@ homicidetidy = homicide %>%
          victim_sex = as.factor(victim_sex),
          victim_race = as.factor(victim_race), 
          city = as.factor(city),
-         state = as.factor(state))
+         state = as.factor(state)) 
 ```
+
+Now, I will use `group by` and `summarize` to  obtain the total number of homicides and number of unsolved homicides by city and display these totals by city.
+```{r}
+summary_by_city = homicidetidy %>% 
+  group_by(city_state) %>% 
+  summarize(homicides_total = n(), 
+            unsolved_total = sum(disposition == c("Closed without arrest", "Open/No arrest")))
+knitr::kable(summary_by_city)
+```
+
+
 
 
