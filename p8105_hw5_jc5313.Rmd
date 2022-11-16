@@ -59,24 +59,23 @@ homicidetidy = homicide %>%
 ```
 
 
-Now, I will use `group by` and `summarize` to  obtain the total number of homicides and number of unsolved homicides by city and display these totals by city.
+Now, I will use `group by` and `summarize` to  obtain the total number of homicides and number of unsolved homicides by city and display these totals by city using `kable`.
 ```{r}
 summary_by_city = homicidetidy %>% 
   group_by(city_state) %>% 
-  summarize(homicides_n = n(), 
-            unsolved_n = sum(disposition == c("Closed without arrest", "Open/No arrest")))
+  summarize(homicides_total = n(), 
+            unsolved_total = sum(disposition == c("Closed without arrest", "Open/No arrest")))
 knitr::kable(summary_by_city)
 ```
 
 
-Next, I run `prop.test` for each of the cities in my dataset `summary_by_city` to estimate the proportion of homicides that are unsolved in Baltimore, MD. 
+Next, I run `prop.test` in my dataset `summary_by_city` to estimate the proportion of homicides that are unsolved in Baltimore, MD, along with the corresponding CI.
 ```{r}
-baltimore =
-  summary_by_city %>%
+baltimore = summary_by_city %>%
   filter(city_state == "Baltimore, MD") 
 baltimore_test = prop.test(
-  x = baltimore[["unsolved_n"]],
-  n = baltimore[["homicides_n"]]) %>%
+  x = baltimore[["unsolved_total"]],
+  n = baltimore[["homicides_total"]]) %>%
   broom::tidy() %>%
   select(estimate, conf.low, conf.high)
 knitr::kable(baltimore_test)
@@ -84,6 +83,19 @@ knitr::kable(baltimore_test)
 I find an estimate of 0.32 (95% CI: 0.30, 0.34) for the proportion of of homicides that are unsolved in Baltimore, MD.
 
 
-Now, 
+Now, I run `prop.test` in my dataset `summary_by_city` for each of the cities in my dataset to estimate the proportion of homicides that are unsolved in each, along with corresponding CIs. I use `purrr:map2` to apply `prop.test` to each of the cities. I display the estimates and CIs for each city using `kable`.
+```{r}
+cities_tests =
+  summary_by_city %>%
+  mutate(p_test = map2(unsolved_total, homicides_total, ~ prop.test(.x, .y) %>%
+  broom::tidy())) %>% 
+  unnest() %>%
+  select(city_state, estimate, conf.low, conf.high)
+knitr::kable(cities_tests)
+```
+
+
+
+
 
 
