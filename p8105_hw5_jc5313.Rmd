@@ -36,8 +36,27 @@ theme_set(theme_minimal() + theme(legend.position = "bottom"))
 
 ## Problem 2
 
-First, I will import the homicide data that was gathered by The Washington Post.
+First, I will import and clean the homicide data that was gathered by The Washington Post and describe the raw data.
 ```{r}
 homicide =
-  read_csv("./data/homicide-data.csv")
+  read_csv("data/homicide-data.csv") %>%
+  janitor::clean_names()
 ```
+
+**Description**: This homicides dataset collected by The Washington Post includes data on `r nrow(homicide)` in 50 of the largest American cities. The dataset contains `r ncol(homicide)` variables, including: the report date of the murder (`report_date`), the victim's first and last name (`victim_first`, `victim_last`), key demographics of the victim (`victim_race`, `victim_age`, `victim_sex`), the location (`city`, `state`, `lat`, `lon`), and the status of the case (`disposition`). 
+
+
+Next, I will tidy the data by using `mutate` to ensure appropriate data types and to make a `city_state` variable. Then, I will summarize within cities to obtain the total number of homicides and number of unsolved homicides.
+
+```{r}
+homicidetidy = homicide %>%
+  mutate(city_state = as.factor(str_c(city, state, sep = ", ")), 
+         reported_date = as.Date(as.character(reported_date),"%Y%m%d"), 
+         victim_age = as.numeric(victim_age), 
+         victim_sex = as.factor(victim_sex),
+         victim_race = as.factor(victim_race), 
+         city = as.factor(city),
+         state = as.factor(state))
+```
+
+
