@@ -129,8 +129,20 @@ sim_data %>%
 
 Next I generate 5000 datasets.
 ```{r}
-
+sim_df = 
+  rerun(5000, sim_function(mu = 0)) %>%
+  bind_rows() 
 ```
 
+Now I repeat for μ = {1,2,3,4,5,6}.
 
+```{r}
+sim_df_repeat = 
+  tibble(mu = c(1:6)) %>% 
+  mutate(
+    output_lists = map(.x = mu, ~rerun(5000, sim_function(mu = .x))),
+    estimates = map(output_lists, bind_rows)) %>% 
+  select(-output_lists) %>% 
+  unnest(estimates) 
+```
 
