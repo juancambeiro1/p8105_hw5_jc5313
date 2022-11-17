@@ -175,3 +175,6 @@ plot_1 %>%
     y = "Proportion of times the null was rejected")
 ```
 
+As the effect size increases, power increases too.
+
+Now I create a plot showing the average of μ and the true value of μ. 
